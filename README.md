@@ -1,99 +1,157 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Blockchain Price Tracker
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+This is a decentralized application (dApp) built with **Nest.js** to track cryptocurrency prices, send alerts, and provide APIs for price-related operations. The application is dockerized and uses a MySQL database.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+---
 
-## Description
+## **Features**
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+1. **Automatic Price Tracking**:
+   - Saves the prices of **Ethereum** and **Polygon** every 5 minutes.
 
-## Project setup
+2. **Email Alerts**:
+   - Automatically sends an email if the price of a chain increases by more than 3% compared to its price one hour ago.
 
+3. **APIs**:
+   - **Get hourly prices** for the past 24 hours.
+   - **Set price alerts** for specific cryptocurrencies.
+   - **Get swap rates** between Ethereum (ETH) and Bitcoin (BTC), including transaction fees.
+
+4. **Swagger Documentation**:
+   - API documentation is available at `/api`.
+
+5. **Dockerized Deployment**:
+   - Easily runnable using a single `docker-compose` command.
+
+---
+
+## **Tech Stack**
+
+- **Framework**: Nest.js
+- **Database**: MySQL
+- **API Client**: Axios (for fetching cryptocurrency prices from CoinGecko)
+- **Scheduler**: `@nestjs/schedule`
+- **Email Service**: Nodemailer
+- **Documentation**: Swagger
+- **Containerization**: Docker
+
+---
+
+## **Setup Instructions**
+
+### Prerequisites
+- Docker and Docker Compose installed on your machine.
+- A valid email account for sending email alerts (e.g., Gmail).
+
+### 1. Clone the Repository
 ```bash
-$ npm install
+git clone <repository-url>
+cd blockchain-price-tracker
 ```
 
-## Compile and run the project
-
-```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+### 2. Create a `.env` File
+Create a `.env` file in the root directory and configure it as follows:
+```env
+DB_HOST=db
+DB_USER=root
+DB_PASSWORD=password
+DB_NAME=price_tracker
+EMAIL_USER=your_email@gmail.com
+EMAIL_PASS=your_email_password
 ```
 
-## Run tests
-
+### 3. Run the Application
+Start the application using Docker Compose:
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+docker-compose up --build
+```
+Wait for the logs to show:
+```
+[NestApplication] Nest application successfully started
+Application is running on: http://localhost:3000
+Swagger is running on: http://localhost:3000/api
 ```
 
-## Deployment
+---
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+## **API Endpoints**
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+### **1. Prices**
+- **GET `/prices/hourly`**:
+  - Returns hourly prices for a specific cryptocurrency for the past 24 hours.
+  - **Query Parameters**:
+    - `chain`: `ethereum` or `polygon`
 
-```bash
-$ npm install -g mau
-$ mau deploy
-```
+- **GET `/prices/swap-rate`**:
+  - Calculates the swap rate from Ethereum (ETH) to Bitcoin (BTC).
+  - **Query Parameters**:
+    - `ethAmount`: The amount of Ethereum.
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+### **2. Alerts**
+- **POST `/alerts`**:
+  - Sets an alert for a specific cryptocurrency price.
+  - **Request Body**:
+    ```json
+    {
+      "chain": "ethereum",
+      "targetPrice": 3500,
+      "email": "example@example.com"
+    }
+    ```
 
-## Resources
+---
 
-Check out a few resources that may come in handy when working with NestJS:
+## **Testing the Application**
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+### **1. Swagger Documentation**
+- Open your browser and navigate to:
+  ```
+  http://localhost:3000/api
+  ```
+- Test all endpoints directly through the Swagger UI.
 
-## Support
+### **2. Verify Data**
+- Log into the MySQL container:
+  ```bash
+  docker exec -it mysql mysql -u root -p
+  ```
+- Run the following queries to verify saved data:
+  ```sql
+  USE price_tracker;
+  SELECT * FROM price ORDER BY timestamp DESC LIMIT 10;
+  SELECT * FROM alert;
+  ```
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+### **3. Simulate Price Increase**
+- Update the price manually to test email notifications:
+  ```sql
+  UPDATE price SET price = price * 1.04 WHERE chain = 'ethereum';
+  ```
 
-## Stay in touch
+- Monitor the logs for email sent confirmation.
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+---
 
-## License
+## **Common Issues**
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+### 1. **Email Not Sending**
+- Ensure the `EMAIL_USER` and `EMAIL_PASS` in `.env` are valid.
+- If using Gmail, enable [App Passwords](https://support.google.com/accounts/answer/185833) or allow less secure apps.
+
+### 2. **Database Connection Errors**
+- Verify the MySQL container is running:
+  ```bash
+  docker ps
+  ```
+- Ensure the `.env` file has the correct database credentials.
+
+### 3. **Swagger Not Accessible**
+- Ensure Swagger is correctly set up in `main.ts`:
+  ```typescript
+  SwaggerModule.setup('api', app, document);
+  ```
+
+---
+
+## **License**
+This project is licensed under the MIT License.

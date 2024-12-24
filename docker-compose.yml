@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      DB_HOST: db
+      DB_USER: root
+      DB_PASSWORD: password
+      DB_NAME: price_tracker
+      EMAIL_USER: your_email@gmail.com
+      EMAIL_PASS: your_password
+    depends_on:
+      - db
+    volumes:
+      - .:/app
+    command: npm run start:dev # Adjust based on how you want to run the app (e.g., dev mode)
+
+  db:
+    image: mysql:8
+    container_name: mysql
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: price_tracker
+    volumes:
+      - mysql_data:/var/lib/mysql
+    restart: always # Ensures the DB container restarts on failures
+
+volumes:
+  mysql_data:
